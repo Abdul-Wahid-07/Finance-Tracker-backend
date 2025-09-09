@@ -36,29 +36,8 @@ export const generateReport = async (req, res) => {
     doc.text(`Email: ${user.email}`);
     doc.moveDown();
 
-    // Overall Totals
-    const default_income = user.income;
-
-    // let additionalIncome = transactions
-    //   .filter((t) => t.type === "income")
-    //   .reduce((acc, t) => acc + t.amount, 0);
-
-    // let totalIncome = default_income + additionalIncome;
-
-    // let totalExpense = transactions
-    //   .filter((t) => t.type === "expense")
-    //   .reduce((acc, t) => acc + t.amount, 0);
-
-    // let balance = totalIncome - totalExpense;
-
-    // doc.fontSize(14).text("Overall Summary", { underline: true });
-    // doc.moveDown(0.5);
-    // doc.fontSize(12).text(`Base Income: ₹${default_income}`);
-    // doc.text(`Additional Income: ₹${additionalIncome}`);
-    // doc.text(`Total Income: ₹${totalIncome}`);
-    // doc.text(`Total Expense: ₹${totalExpense}`);
-    // doc.text(`Balance: ₹${balance}`);
-    // doc.moveDown(1.5);
+    // Base income
+    const default_income = user.income || 0;
 
     // Group transactions by month-year
     const grouped = {};
@@ -74,26 +53,25 @@ export const generateReport = async (req, res) => {
       grouped[monthYear][t.type].push(t);
     });
 
-    // Render grouped transactions
-    for (const [monthYear, { income, expense }] of Object.entries(grouped)) {
+    // Correct iteration
+    for (const [monthYear, { income, expense }] of Object.entries(grouped).reverse()) {
       doc.fontSize(16).text(monthYear, { underline: true });
       doc.moveDown(0.5);
 
       // Calculate monthly totals
-      const monthlyIncome = income.reduce((acc, t) => acc + t.amount, 0) + default_income;
+      const additionalIncome = income.reduce((acc, t) => acc + t.amount, 0);
+      const monthlyIncome = additionalIncome + default_income;
       const monthlyExpense = expense.reduce((acc, t) => acc + t.amount, 0);
       const monthlyBalance = monthlyIncome - monthlyExpense;
 
-      // Monthly Summary section
+      // Monthly Summary
       doc.fontSize(14).text("Monthly Summary", { underline: true });
       doc.moveDown(0.5);
       doc.fontSize(12).text(`Base Income: ₹${default_income}`);
-      doc.text(
-        `Additional Income: ₹${income.reduce((acc, t) => acc + t.amount, 0)}`
-      );
+      doc.text(`Additional Income: ₹${additionalIncome}`);
       doc.text(`Total Income: ₹${monthlyIncome}`);
       doc.text(`Total Expense: ₹${monthlyExpense}`);
-      doc.text(`Previous month Balance + this month Balance: ₹${monthlyBalance}`);
+      doc.text(`Balance: ₹${monthlyBalance}`);
       doc.moveDown(1);
 
       // Income list
@@ -134,7 +112,7 @@ export const generateReport = async (req, res) => {
         doc.moveDown();
       }
 
-      // Small divider
+      // Divider
       doc.moveDown(1).text("------------------------------", {
         align: "center",
       });
