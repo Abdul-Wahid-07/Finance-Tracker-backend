@@ -12,7 +12,7 @@ dotenv.config();
 const app = express();
 
 const corsOptions = {
-    origin: "http://localhost:3000",
+    origin: "https://finance-tracker-green-tau.vercel.app/",
     methods: "GET, POST, PUT, PATCH, DELETE, HEAD",
     credentials: true,
 };
