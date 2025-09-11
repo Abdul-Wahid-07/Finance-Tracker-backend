@@ -45,7 +45,7 @@ const register = async (req, res) => {
                         You can now log in and start managing your income, expenses, and savings easily.
                     </p>
                     <div style="text-align: center; margin: 20px 0;">
-                        <a href="http://localhost:3000/login" 
+                        <a href="https://finance-tracker-green-tau.vercel.app/login" 
                         style="background: #4CAF50; color: white; text-decoration: none; padding: 12px 25px; border-radius: 5px; font-weight: bold;">
                         Login to Your Account
                         </a>
@@ -146,7 +146,7 @@ const contact = async (req, res) => {
                     Meanwhile, you can continue exploring your dashboard and managing your finances with ease.
                 </p>
                 <div style="text-align: center; margin: 20px 0;">
-                    <a href="http://localhost:3000/dashboard" 
+                    <a href="https://finance-tracker-green-tau.vercel.app/dashboard" 
                     style="background: #2196F3; color: white; text-decoration: none; padding: 12px 25px; border-radius: 5px; font-weight: bold;">
                     Go to Dashboard
                     </a>
