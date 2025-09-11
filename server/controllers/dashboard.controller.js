@@ -54,7 +54,7 @@ const dashboardData = async (req, res) => {
       createdAt: { $lt: startOfMonth },
     });
 
-    const prevIncome = prevTransactions
+    const prevIncome = baseIncome + prevTransactions
       .filter((t) => t.type === "income")
       .reduce((acc, t) => acc + t.amount, 0);
 
