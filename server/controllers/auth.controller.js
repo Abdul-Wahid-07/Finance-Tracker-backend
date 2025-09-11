@@ -117,9 +117,34 @@ const login = async (req, res) => {
 };
 
 // contact logic
-const contact = async (req, res) => {
+const contact = async (req, res, next) => {
     try {
         const response = req.body;
+
+        // check if request is from logged-in user
+        const isLoggedIn = req.user ? true : false;
+
+        // conditional message and button
+        const userSection = isLoggedIn
+            ? `<p style="font-size: 14px; color: #555;">
+                    Meanwhile, you can continue exploring your dashboard and managing your finances with ease.
+               </p>
+               <div style="text-align: center; margin: 20px 0;">
+                   <a href="https://finance-tracker-green-tau.vercel.app/dashboard" 
+                   style="background: #2196F3; color: white; text-decoration: none; padding: 12px 25px; border-radius: 5px; font-weight: bold;">
+                   Go to Dashboard
+                   </a>
+               </div>`
+            : `<p style="font-size: 14px; color: #555;">
+                    Meanwhile, feel free to explore our website and learn how Personal Finance Tracker can help you manage your finances.
+               </p>
+               <div style="text-align: center; margin: 20px 0;">
+                   <a href="https://finance-tracker-green-tau.vercel.app/" 
+                   style="background: #2196F3; color: white; text-decoration: none; padding: 12px 25px; border-radius: 5px; font-weight: bold;">
+                   Explore Website
+                   </a>
+               </div>`;
+
         await sendEmail(
             response.email,
             "Contact Form Confirmation",
@@ -142,15 +167,7 @@ const contact = async (req, res) => {
                     <p style="font-size: 14px; margin: 0;"><b>Your Message:</b></p>
                     <p style="font-size: 14px; color: #555; margin: 5px 0;">${response.message}</p>
                 </div>
-                <p style="font-size: 14px; color: #555;">
-                    Meanwhile, you can continue exploring your dashboard and managing your finances with ease.
-                </p>
-                <div style="text-align: center; margin: 20px 0;">
-                    <a href="https://finance-tracker-green-tau.vercel.app/dashboard" 
-                    style="background: #2196F3; color: white; text-decoration: none; padding: 12px 25px; border-radius: 5px; font-weight: bold;">
-                    Go to Dashboard
-                    </a>
-                </div>
+                ${userSection}
                 <p style="font-size: 13px; color: #777;">
                     If you didn’t submit this request, you can safely ignore this email.  
                 </p>
@@ -163,13 +180,15 @@ const contact = async (req, res) => {
             </tr>
             </table>
         </body>`
-        )
+        );
+
         await Contact.create(response);
-        return res.status(200).json({ message: "Message send successfully" })
+        return res.status(200).json({ message: "Message sent successfully" });
     } catch (error) {
         next(error);
     }
 }
+
 
 const user = async (req, res) => {
     try {
