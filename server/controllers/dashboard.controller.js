@@ -48,16 +48,31 @@ const dashboardData = async (req, res) => {
     // Total income this month = salary + extra incomes
     const totalIncome = baseIncome + additionalIncome;
 
-    // Carry over balance from previous months (exclude salary because it is monthly)
+    // Carry over balance from previous months
     const prevTransactions = await Transaction.find({
       userId,
       createdAt: { $lt: startOfMonth },
     });
 
-    const prevIncome = baseIncome + prevTransactions
-      .filter((t) => t.type === "income")
-      .reduce((acc, t) => acc + t.amount, 0);
+    // Determine how many months passed since user created
+    const accountStartDate =
+      user.createdAt || prevTransactions.at(-1)?.createdAt || startOfMonth;
 
+    const monthsPassed =
+      (now.getFullYear() - accountStartDate.getFullYear()) * 12 +
+      (now.getMonth() - accountStartDate.getMonth());
+
+    // Salary from all previous months
+    const totalBaseIncomePrev = monthsPassed * baseIncome;
+
+    // Other incomes from previous transactions
+    const prevIncome =
+      totalBaseIncomePrev +
+      prevTransactions
+        .filter((t) => t.type === "income")
+        .reduce((acc, t) => acc + t.amount, 0);
+
+    // Expenses from previous transactions
     const prevExpenses = prevTransactions
       .filter((t) => t.type === "expense")
       .reduce((acc, t) => acc + t.amount, 0);
@@ -65,7 +80,7 @@ const dashboardData = async (req, res) => {
     // Balance from all previous months
     const prevBalance = prevIncome - prevExpenses;
 
-    // Final balance = last month balance + salary for this month + additional incomes − expenses
+    // Final balance = prev balance + this month salary + extra incomes - this month expenses
     const balance = prevBalance + baseIncome + additionalIncome - expenses;
 
     // Categories for pie (this month only)
